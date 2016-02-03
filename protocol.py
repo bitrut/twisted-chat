@@ -13,7 +13,7 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
         if not isBinary:
             msg = payload.decode('utf8')
             if msg.startswith('/name'):
-                self.username = msg.split(' ', 1)[-1]
+                self.setUsername(msg.split(' ', 1)[-1])
                 print 'Client username set to "{}"'.format(self)
             else:
                 self.factory.broadcast(self, msg)
@@ -37,10 +37,17 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
             self.sendEntry(entry)
 
     def sendChatUsers(self):
-        msg = '/users {}'.format([
-            user.username for user in self.factory.users
-        ])
+        msg = '/users {}'.format(
+            ','.join(
+                [str(user) for user in self.factory.users]
+            )
+        )
         self.sendMessage(msg)
+
+    def setUsername(self, username):
+        self.username = username
+        print 'Client username set to "{}"'.format(self)
+        self.factory.broadcastChatUsers()
 
     def __str__(self):
         return self.username or self.peer
