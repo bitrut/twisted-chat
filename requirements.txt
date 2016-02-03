@@ -1,0 +1,2 @@
+Twisted==15.5.0
+autobahn==0.12.1
