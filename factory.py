@@ -4,7 +4,7 @@ from datetime import datetime
 from autobahn.twisted.websocket import WebSocketServerFactory
 
 
-Entry = namedtuple('Entry', ['timestamp', 'sender', 'msg'])
+Entry = namedtuple('Entry', ['timestamp', 'sender', 'message'])
 
 
 class BroadcastServerFactory(WebSocketServerFactory):
@@ -30,9 +30,9 @@ class BroadcastServerFactory(WebSocketServerFactory):
             print "Unregistered user {}".format(user)
             self.users.remove(user)
 
-    def broadcast(self, sender, msg):
-        print "Broadcasting message '{}' from {}".format(msg, sender)
-        entry = Entry(timestamp=datetime.now(), sender=sender, msg=msg)
+    def broadcast(self, sender, message):
+        print "Broadcasting message '{}' from {}".format(message, sender)
+        entry = Entry(timestamp=datetime.now(), sender=sender, message=message)
         for user in self.users:
             user.sendEntry(entry)
         self.chat.append(entry)

@@ -1,3 +1,5 @@
+import json
+
 from autobahn.twisted.websocket import WebSocketServerProtocol
 
 
@@ -11,12 +13,12 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
 
     def onMessage(self, payload, isBinary):
         if not isBinary:
-            msg = payload.decode('utf8')
-            if msg.startswith('/username'):
-                self.setUsername(msg.split(' ', 1)[-1])
+            message = payload.decode('utf8')
+            if message.startswith('/username'):
+                self.setUsername(message.split(' ', 1)[-1])
                 print 'Client username set to "{}"'.format(self)
             else:
-                self.factory.broadcast(self, msg)
+                self.factory.broadcast(self, message)
 
     def connectionLost(self, reason):
         WebSocketServerProtocol.connectionLost(self, reason)
@@ -24,25 +26,25 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
         self.factory.broadcastChatUsers()
 
     def sendEntry(self, entry):
-        msg = '[{}] {}: {}'.format(
-            entry.timestamp.isoformat(),
-            entry.sender,
-            entry.msg
-        )
-        self.sendMessage(msg)
-        print 'Message "{}" sent to {}'.format(msg, self)
+        message = json.dumps({
+            'timestamp': entry.timestamp.isoformat(),
+            'sender': str(entry.sender),
+            'message': entry.message
+        })
+        self.sendMessage(message)
+        print 'Message "{}" sent to {}'.format(message, self)
 
     def sendChat(self):
         for entry in self.factory.chat:
             self.sendEntry(entry)
 
     def sendChatUsers(self):
-        msg = '/users {}'.format(
+        message = '/users {}'.format(
             ','.join(
                 [str(user) for user in self.factory.users]
             )
         )
-        self.sendMessage(msg)
+        self.sendMessage(message)
 
     def setUsername(self, username):
         self.username = username
