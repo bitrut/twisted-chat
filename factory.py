@@ -31,7 +31,9 @@ class BroadcastServerFactory(WebSocketServerFactory):
             self.users.remove(user)
 
     def broadcast(self, sender, message):
-        print "Broadcasting message '{}' from {}".format(message, sender)
+        print "Broadcasting message '{}' from {}".format(
+            message.encode('utf8'), sender
+        )
         entry = Entry(timestamp=datetime.now(), sender=sender, message=message)
         for user in self.users:
             user.sendEntry(entry)
