@@ -1,2 +1,2 @@
 # twisted-chat
-Wicked based chat server using websocket protocol
+Twisted based chat server using websocket protocol
