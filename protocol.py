@@ -4,14 +4,18 @@ from autobahn.twisted.websocket import WebSocketServerProtocol
 class BroadcastServerProtocol(WebSocketServerProtocol):
 
     def onOpen(self):
-        self.name = None
+        self.username = None
         self.factory.register(self)
         self.sendChat()
 
     def onMessage(self, payload, isBinary):
         if not isBinary:
             msg = payload.decode('utf8')
-            self.factory.broadcast(self, msg)
+            if msg.startswith('/name'):
+                self.username = msg.split(' ', 1)[-1]
+                print 'Client username set to "{}"'.format(self)
+            else:
+                self.factory.broadcast(self, msg)
 
     def connectionLost(self, reason):
         WebSocketServerProtocol.connectionLost(self, reason)
@@ -19,7 +23,7 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
 
     def sendMessage(self, entry):
         msg = '[{}] {}: {}'.format(
-            entry.timestamp.strftime("%Y-%m-%d %H:%M"),
+            entry.timestamp.isoformat(),
             entry.sender,
             entry.msg
         )
@@ -31,4 +35,4 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
             self.sendMessage(entry)
 
     def __str__(self):
-        return self.name or self.peer
+        return self.username or self.peer
