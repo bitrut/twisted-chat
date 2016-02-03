@@ -34,5 +34,9 @@ class BroadcastServerFactory(WebSocketServerFactory):
         print "Broadcasting message '{}' from {}".format(msg, sender)
         entry = Entry(timestamp=datetime.now(), sender=sender, msg=msg)
         for user in self.users:
-            user.sendMessage(entry)
+            user.sendEntry(entry)
         self.chat.append(entry)
+
+    def broadcastChatUsers(self):
+        for user in self.users:
+            user.sendChatUsers()
