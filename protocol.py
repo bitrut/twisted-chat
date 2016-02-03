@@ -12,7 +12,7 @@ class BroadcastServerProtocol(WebSocketServerProtocol):
     def onMessage(self, payload, isBinary):
         if not isBinary:
             msg = payload.decode('utf8')
-            if msg.startswith('/name'):
+            if msg.startswith('/username'):
                 self.setUsername(msg.split(' ', 1)[-1])
                 print 'Client username set to "{}"'.format(self)
             else:
